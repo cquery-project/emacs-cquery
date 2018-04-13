@@ -96,7 +96,7 @@ in a subproject and thus does not belong to the current workspace.
   :group 'cquery)
 
 (defcustom cquery-project-root-matchers
-  '(cquery-project-roots-matcher projectile-project-root "compile_commands.json" ".cquery")
+  '(cquery-project-roots-matcher projectile-project-root "compile_commands.json" ".cquery" "build/compile_commands.json")
   "List of matchers that are used to locate the cquery project roots.
 Each matcher is run in order, and the first successful (non-nil) matcher
 determines the project root.
