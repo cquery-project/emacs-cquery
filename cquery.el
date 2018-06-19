@@ -198,10 +198,14 @@ Read document for all choices. DISPLAY-ACTION is passed to xref--show-xrefs."
   (lsp-provide-marked-string-renderer client "cpp" (cquery--make-renderer "c++"))
   (lsp-provide-marked-string-renderer client "objectivec" (cquery--make-renderer "objc")))
 
+; TODO: prog reports for modeline
 (defun cquery--get-init-params (workspace)
-  `(:cacheDirectory ,(file-name-as-directory
+  `(,@cquery-extra-init-params
+    :cacheDirectory ,(file-name-as-directory
                       (expand-file-name cquery-cache-dir (lsp--workspace-root workspace)))
-                    ,@cquery-extra-init-params)) ; TODO: prog reports for modeline
+    :highlight (:enabled ,(or (and cquery-sem-highlight-method t) :json-false))
+    :emitInactiveRegions ,(or cquery-enable-inactive-region :json-false)))
+
 
 ;;;###autoload (autoload 'lsp-cquery-enable "cquery")
 (lsp-define-stdio-client
