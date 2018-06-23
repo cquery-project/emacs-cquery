@@ -149,11 +149,11 @@
   :group 'cquery-sem)
 
 (defcustom cquery-enable-inactive-region
-  t
+  nil
   "Enable inactive region.
 Regions that are disabled by preprocessors will be displayed in shadow."
   :group 'cquery-sem
-  :type 'bool)
+  :type 'boolean)
 
 (defcustom cquery-sem-highlight-method
   nil
