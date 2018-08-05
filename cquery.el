@@ -83,6 +83,23 @@ Relative to the project root directory."
   :type '(repeat function)
   :group 'cquery)
 
+(defcustom cquery-cache-dir-function #'cquery-cache-dir-in-project
+  "A function returning the directory to store cache files given the project path."
+  :type '(radio
+          (function-item cquery-cache-dir-in-project)
+          (function-item cquery-cache-dir-consolidated))
+  :group 'cquery)
+
+(defcustom cquery-cache-dir-consolidated-path
+  (expand-file-name "cquery-cache.d" user-emacs-directory)
+  "Root path used by cquery-cache-dir-consolidated .
+
+Cquery cache files will be stored here in separate directories for each project.
+By default, this is a directory in the user's emacs.d directory, but it can be any
+absolute path."
+  :type 'string
+  :group 'cquery)
+
 (defcustom cquery-project-roots
   nil
   "A list of project roots that will be matched against the source filename first
@@ -179,6 +196,20 @@ Read document for all choices. DISPLAY-ACTION is passed to xref--show-xrefs."
     (xref--show-xrefs xrefs display-action)))
 
 
+(defun cquery-cache-dir-in-project (proj-dir)
+  "Return project relative cache directory (see cquery-cache-dir-function).
+
+The name of the project-relative directory used for this is given by cquery-cache-dir."
+  (expand-file-name cquery-cache-dir proj-dir))
+
+(defun cquery-cache-dir-consolidated (proj-dir)
+  "Return consolidated cache directory path. (see cquery-cache-dir-function).
+
+The place is given by cquery-cache-dir-consolidated-path."
+  (expand-file-name
+   (replace-regexp-in-string "\/" "!" (directory-file-name proj-dir) t t nil 1)
+   cquery-cache-dir-consolidated-path))
+
 ;; ---------------------------------------------------------------------
 ;;  Register lsp client
 ;; ---------------------------------------------------------------------
@@ -202,7 +233,7 @@ Read document for all choices. DISPLAY-ACTION is passed to xref--show-xrefs."
 (defun cquery--get-init-params (workspace)
   `(,@cquery-extra-init-params
     :cacheDirectory ,(file-name-as-directory
-                      (expand-file-name cquery-cache-dir (lsp--workspace-root workspace)))
+                      (funcall cquery-cache-dir-function (lsp--workspace-root workspace)))
     :highlight (:enabled ,(or (and cquery-sem-highlight-method t) :json-false))
     :emitInactiveRegions ,(or cquery-enable-inactive-region :json-false)))
 
