@@ -214,36 +214,34 @@ The place is given by cquery-cache-dir-consolidated-path."
 ;;  Register lsp client
 ;; ---------------------------------------------------------------------
 
-(defun cquery--make-renderer (mode)
-  `(lambda (str)
-     (with-temp-buffer
-       (delay-mode-hooks (,(intern (format "%s-mode" mode))))
-       (insert str)
-       (font-lock-ensure)
-       (buffer-string))))
-
-(defun cquery--initialize-client (client)
-  (dolist (p cquery--handlers)
-    (lsp-client-on-notification client (car p) (cdr p)))
-  (lsp-provide-marked-string-renderer client "c" (cquery--make-renderer "c"))
-  (lsp-provide-marked-string-renderer client "cpp" (cquery--make-renderer "c++"))
-  (lsp-provide-marked-string-renderer client "objectivec" (cquery--make-renderer "objc")))
-
 ; TODO: prog reports for modeline
-(defun cquery--get-init-params (workspace)
+(defun cquery--get-init-params ()
   `(,@cquery-extra-init-params
     :cacheDirectory ,(file-name-as-directory
-                      (funcall cquery-cache-dir-function (lsp--workspace-root workspace)))
+                      (funcall cquery-cache-dir-function default-directory))
     :highlight (:enabled ,(or (and cquery-sem-highlight-method t) :json-false))
     :emitInactiveRegions ,(or cquery-enable-inactive-region :json-false)))
 
+(defun cquery--suggest-project-root ()
+  (and (memq major-mode '(c-mode c++-mode objc-mode))
+       (cquery--get-root)))
 
-;;;###autoload (autoload 'lsp-cquery-enable "cquery")
-(lsp-define-stdio-client
- lsp-cquery "cpp" #'cquery--get-root
- `(,cquery-executable ,@cquery-extra-args)
- :initialize #'cquery--initialize-client
- :extra-init-params #'cquery--get-init-params)
+(advice-add 'lsp--suggest-project-root :before-until #'cquery--suggest-project-root)
+
+(lsp-register-client
+ (make-lsp-client
+  :new-connection
+  (lsp-stdio-connection (lambda () (cons cquery-executable cquery-extra-args)))
+  :major-modes '(c-mode c++-mode objc-mode)
+  :server-id 'cquery
+  :multi-root nil
+  :notification-handlers
+  (lsp-ht
+   ("$cquery/progress" #'ignore)
+   ("$cquery/setInactiveRegions" #'cquery--set-inactive-regions)
+   ("$cquery/publishSemanticHighlighting" #'cquery--publish-semantic-highlighting))
+  :initialization-options #'cquery--get-init-params
+  :library-folders-fn nil))
 
 (provide 'cquery)
 ;;; cquery.el ends here

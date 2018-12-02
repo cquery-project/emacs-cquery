@@ -304,10 +304,6 @@ If nil, disable semantic highlighting."
                           (cl-loop for i below (length ,colors) collect
                                    (intern (format "cquery-sem-%s-face-%S" ,kind i)))))))))))
 
-;; Add handler
-(push '("$cquery/publishSemanticHighlighting" . (lambda (w p) (cquery--publish-semantic-highlighting w p)))
-      cquery--handlers)
-
 ;; ---------------------------------------------------------------------
 ;;   Inactive regions
 ;; ---------------------------------------------------------------------
@@ -332,9 +328,5 @@ If nil, disable semantic highlighting."
                (overlay-put ov 'face 'cquery-inactive-region-face)
                (overlay-put ov 'cquery-inactive t)
                (push ov cquery--inactive-overlays))))))))
-
-;; Add handler
-(push '("$cquery/setInactiveRegions" . (lambda (w p) (cquery--set-inactive-regions w p)))
-      cquery--handlers)
 
 (provide 'cquery-semantic-highlighting)

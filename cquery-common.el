@@ -23,7 +23,7 @@
 ;;; Code:
 
 (require 'cc-mode)
-(require 'lsp-mode)
+(require 'lsp)
 (require 'cl-lib)
 (require 'subr-x)
 (require 'dash)
@@ -62,8 +62,7 @@
            (-when-let (root (cl-typecase matcher
                               (string (cquery--root-from-file matcher))
                               (function  (cquery--root-from-func matcher))))
-             (cl-return-from cquery--get-root root)))
-  (user-error "Could not find cquery project root"))
+             (cl-return-from cquery--get-root root))))
 
 (defun cquery--is-cquery-buffer (&optional buffer)
   "Return non-nil if current buffer is using the cquery client"
@@ -91,16 +90,6 @@
 (defun cquery--render-type (str)
   "Render a string as a type"
   (string-remove-suffix " a;" (cquery--render-string (format "%s a;" str))))
-
-;; ---------------------------------------------------------------------
-;;   Notification handlers
-;; ---------------------------------------------------------------------
-
-(defvar cquery--handlers
-  '(("$cquery/progress" . (lambda (_w _p))))
-  "List of cons-cells of (METHOD . HANDLER) pairs, where METHOD is the lsp method to handle, 
-and handler is a function invoked as (handler WORKSPACE PARAMS), where WORKSPACE is the current
-lsp-workspace, and PARAMS is a hashmap of the params recieved with the notification.")
 
 ;; ---------------------------------------------------------------------
 ;;   Commands
