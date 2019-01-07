@@ -118,21 +118,22 @@
 
 (defun cquery-call-hierarchy (callee)
   (interactive "P")
-  (cquery--cquery-buffer-check)
-  (setq callee (if callee t :json-false))
-  (cquery-tree--open
-   (make-cquery-tree-client
-    :name "call hierarchy"
-    :mode-line-format (format " %s %s %s %s"
-                              (propertize (if (eq callee t) "Callee types:" "Caller types:") 'face 'cquery-tree-mode-line-face)
-                              (propertize "Normal" 'face 'cquery-call-hierarchy-node-normal-face)
-                              (propertize "Base" 'face 'cquery-call-hierarchy-node-base-face)
-                              (propertize "Derived" 'face 'cquery-call-hierarchy-node-derived-face))
-    :top-line-f (lambda () (propertize (if (eq callee t) "Callees of " "Callers of") 'face 'cquery-tree-mode-line-face))
-    :make-string-f 'cquery-call-hierarchy--make-string
-    :read-node-f 'cquery-call-hierarchy--read-node
-    :request-children-f (apply-partially #'cquery-call-hierarchy--request-children callee)
-    :request-init-f (lambda () (cquery-call-hierarchy--request-init callee)))))
+  (when-lsp-workspace (cquery--get-lsp-workspace)
+    (cquery--cquery-buffer-check)
+    (setq callee (if callee t :json-false))
+    (cquery-tree--open
+     (make-cquery-tree-client
+      :name "call hierarchy"
+      :mode-line-format (format " %s %s %s %s"
+                                (propertize (if (eq callee t) "Callee types:" "Caller types:") 'face 'cquery-tree-mode-line-face)
+                                (propertize "Normal" 'face 'cquery-call-hierarchy-node-normal-face)
+                                (propertize "Base" 'face 'cquery-call-hierarchy-node-base-face)
+                                (propertize "Derived" 'face 'cquery-call-hierarchy-node-derived-face))
+      :top-line-f (lambda () (propertize (if (eq callee t) "Callees of " "Callers of") 'face 'cquery-tree-mode-line-face))
+      :make-string-f 'cquery-call-hierarchy--make-string
+      :read-node-f 'cquery-call-hierarchy--read-node
+      :request-children-f (apply-partially #'cquery-call-hierarchy--request-children callee)
+      :request-init-f (lambda () (cquery-call-hierarchy--request-init callee))))))
 
 (provide 'cquery-call-hierarchy)
 ;;; cquery-call-hierarchy.el ends here

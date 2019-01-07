@@ -91,6 +91,11 @@
   "Render a string as a type"
   (string-remove-suffix " a;" (cquery--render-string (format "%s a;" str))))
 
+(defun cquery--get-lsp-workspace ()
+  "Return cquery workspace for current buffer or nil"
+  (find-if '(lambda (ws) (equal 'cquery (lsp--client-server-id (lsp--workspace-client ws))))
+           lsp--buffer-workspaces))
+
 ;; ---------------------------------------------------------------------
 ;;   Commands
 ;; ---------------------------------------------------------------------
