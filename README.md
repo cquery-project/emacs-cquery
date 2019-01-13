@@ -33,9 +33,6 @@ Refer to <https://github.com/jacobdufault/cquery/wiki/Emacs> for details.
 ![with company-lsp](https://ptpb.pw/lDaw.jpg)
 ![with helm-xref, approximate workspace/symbol search](https://ptpb.pw/KOKn.jpg)
 
-`$cquery/memberHierarchy`
-![$cquery/memberHierarchy](https://ptpb.pw/iOSt.gif)
-
 `$cquery/callHierarchy` (caller hierarchy and callee hierarchy)
 ![$cquery/callHierarchy](https://ptpb.pw/GKJw.gif)
 

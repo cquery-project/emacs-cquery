@@ -41,7 +41,6 @@
 (require 'cquery-tree)
 (require 'cquery-call-hierarchy)
 (require 'cquery-inheritance-hierarchy)
-(require 'cquery-member-hierarchy)
 
 (require 'seq)
 
