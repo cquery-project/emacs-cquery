@@ -68,7 +68,7 @@
   "Return non-nil if current buffer is using the cquery client"
   (with-current-buffer (or buffer (current-buffer))
     (and lsp--cur-workspace
-         (eq (lsp--client-get-root (lsp--workspace-client lsp--cur-workspace)) 'cquery--get-root))))
+         (equal (lsp--workspace-root lsp--cur-workspace) (cquery--get-root)))))
 
 (define-inline cquery--cquery-buffer-check ()
   (inline-quote (cl-assert (cquery--is-cquery-buffer) nil
